@@ -1,3 +1,3 @@
 library(testthat)
-library(artificer.se)
-test_check('artificer.se')
+library(alabaster.se)
+test_check('alabaster.se')

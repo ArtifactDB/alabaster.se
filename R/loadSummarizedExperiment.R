@@ -57,5 +57,10 @@ loadSummarizedExperiment <- function(exp.info, project) {
         se <- SummarizedExperiment(all.assays, colData=cd, rowRanges=rr, checkDimnames=FALSE)
     }
 
+    # Need to force the dimnames to match the DFs, because if they're NULL,
+    # the dimnames from the assays end up being used instead.
+    rownames(se) <- rownames(rd)
+    colnames(se) <- rownames(cd)
+
     .restoreMetadata(se, NULL, meta.data = exp.info$summarized_experiment$other_data, project = project)
 }

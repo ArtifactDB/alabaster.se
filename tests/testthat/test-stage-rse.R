@@ -52,7 +52,8 @@ test_that("stageObject allows us to forcibly skip the ranges", {
     dir.create(tmp)
 
     out <- stageObject(se, tmp, "rnaseq", skip.ranges=TRUE)
-    expect_match(jsonlite::fromJSON(file.path(tmp, paste0(out$summarized_experiment$row_data$resource$path, ".json")))[["$schema"]], "csv_data_frame")
+    expect_true("row_data" %in% names(out$summarized_experiment))
+    expect_false("row_ranges" %in% names(out$summarized_experiment))
 
     out2 <- loadSummarizedExperiment(out, tmp)
     expect_identical(as.character(class(out2)), "SummarizedExperiment")
@@ -66,7 +67,7 @@ test_that("stageObject handles GRLs", {
     dir.create(tmp)
 
     out <- stageObject(se, tmp, "rnaseq")
-    rrmeta <- jsonlite::fromJSON(file.path(tmp, paste0(out$summarized_experiment$row_data$resource$path, ".json")), simplifyVector=FALSE)
+    rrmeta <- jsonlite::fromJSON(file.path(tmp, paste0(out$summarized_experiment$row_ranges$resource$path, ".json")), simplifyVector=FALSE)
     expect_true(rrmeta$compressed_list$names)
 
     grouping <- read.csv(file.path(tmp, rrmeta$path), row.names=1)

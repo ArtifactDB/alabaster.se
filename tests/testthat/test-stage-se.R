@@ -1,5 +1,5 @@
 # This tests the stageObject generic for base SE's.
-# library(testthat); library(artificer.se); source("test-stage-se.R")
+# library(testthat); library(alabaster.se); source("test-stage-se.R")
 
 # Making an SE and annotating it.
 mat <- matrix(rpois(2000, 10), ncol=10)
@@ -101,7 +101,7 @@ test_that("stageObject works with the various types of vectors", {
     out <- stageObject(se, tmp, "rnaseq")
 
     meta <- jsonlite::fromJSON(file.path(tmp, paste0(out$summarized_experiment$column_data$resource$path, ".json")), simplifyVector=FALSE)$data_frame
-    expect_identical(unlist(meta$columns[[1]]$values), LETTERS[1:3])
+    expect_identical(meta$columns[[1]]$type, "string")
     expect_identical(read.csv(file.path(tmp, meta$columns[[2]]$levels$resource$path))[,1], LETTERS[10:1])
     expect_identical(meta$columns[[3]]$type, "integer")
     expect_identical(meta$columns[[4]]$type, "number")
@@ -126,8 +126,8 @@ test_that("stageObject handles data frames in the assays", {
     assay(se) <- as.data.frame(assay(se))
     expect_error(stageObject(se, tmp, "df_fail"), "should not contain data.frame")
 
-    opt <- options(artificer.se.reject_data.frames=FALSE)
-    on.exit(options(artificer.se.reject_data.frames=TRUE))
+    opt <- options(alabaster.se.reject_data.frames=FALSE)
+    on.exit(options(alabaster.se.reject_data.frames=TRUE))
 
     # still doesn't handle data.frame...
     expect_error(stageObject(se, tmp, "df_fail2"), "should not contain data.frame")
