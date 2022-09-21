@@ -39,6 +39,11 @@ Callers should make sure to write the metadata to the same path by using \code{\
 
 If \code{skip.ranges=TRUE}, the RangedSummarizedExperiment method just calls the SummarizedExperiment method, i.e., \code{\link{rowRanges}} are not saved.
 This avoids the hassle of switching classes and the associated problems, e.g., \url{https://github.com/Bioconductor/SummarizedExperiment/issues/29}.
+Note that any subsequent \code{\link{loadObject}} call on the staged assets will return a non-ranged SummarizedExperiment.
+
+If \code{x} is a RangedSummarizedExperiment with \dQuote{empty} \code{\link{rowRanges}} (i.e., a \linkS4class{GRangesList} with zero-length entries),
+\code{stageObject} will save it to file without any genomic range information.
+This means that any subsequent \code{\link{loadObject}} on the staged assets will return a non-ranged SummarizedExperiment.
 
 By default, we consider the presence of data frames in the assays to be an error.
 Users should coerce these into an appropriate matrix type, e.g., a dense matrix or a sparse dgCMatrix.
