@@ -4,7 +4,7 @@ author:
 - name: Aaron Lun
   email: infinite.monkeys.with.keyboards@gmail.com
 package: alabaster.se
-date: "Revised: September 22, 2021"
+date: "Revised: September 22, 2022"
 output:
   BiocStyle::html_document
 vignette: >
@@ -36,7 +36,7 @@ rse
 library(alabaster.se)
 tmp <- tempfile()
 dir.create(tmp)
-meta <- stageObject(se, tmp, "se")
+meta <- stageObject(rse, tmp, "se")
 .writeMetadata(meta, tmp)
 
 list.files(tmp, recursive=TRUE)
