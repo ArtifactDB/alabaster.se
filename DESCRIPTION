@@ -23,6 +23,7 @@ Imports:
 Suggests:
     rmarkdown,
     knitr,
-    testthat
+    testthat,
+    BiocStyle
 VignetteBuilder: knitr
 RoxygenNote: 7.2.1
