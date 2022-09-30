@@ -49,6 +49,7 @@ test_that("stageObject works as expected with no row or column names", {
     dimnames(se) <- NULL
 
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     expect_identical(vapply(out$summarized_experiment$assays, function(x) x$name, ""), assayNames(se))
 
     cdf <- read.csv(file.path(tmp, out$summarized_experiment$column_data$resource$path))
@@ -73,6 +74,7 @@ test_that("stageObject works as expected with no row or column data, but still n
     rowData(se) <- rowData(se)[,0]
 
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     expect_identical(vapply(out$summarized_experiment$assays, function(x) x$name, ""), assayNames(se))
 
     cdf <- read.csv(file.path(tmp, out$summarized_experiment$column_data$resource$path), row.names=1)
@@ -96,6 +98,7 @@ test_that("stageObject works as expected with no row or column data at all", {
     dimnames(se) <- list(NULL, NULL)
 
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     expect_identical(vapply(out$summarized_experiment$assays, function(x) x$name, ""), assayNames(se))
 
     expect_null(out$summarized_experiment$column_data)
@@ -119,6 +122,7 @@ test_that("stageObject works with the various types of vectors", {
     se$birthday <- rep(Sys.Date(), ncol(se)) - sample(100, ncol(se))
 
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
 
     meta <- jsonlite::fromJSON(file.path(tmp, paste0(out$summarized_experiment$column_data$resource$path, ".json")), simplifyVector=FALSE)$data_frame
     expect_identical(meta$columns[[1]]$type, "string")
@@ -155,6 +159,7 @@ test_that("stageObject handles data frames in the assays", {
     # but now can handle DataFrame.
     assay(se) <- as(assay(se), "DataFrame")
     expect_error(out <- stageObject(se, tmp, "rnaseq"), NA)
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
 
     path <- file.path(tmp, out$summarized_experiment$assays[[1]]$resource$path)
     meta <- jsonlite::fromJSON(paste0(path, ".json"), simplifyVector=FALSE)
@@ -167,6 +172,7 @@ test_that("stageExperiment saves other metadata when necessary", {
 
     metadata(se)$YAY <- 1
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     expect_true(file.exists(file.path(tmp, out$summarized_experiment$other_data$resource$path)))
 
     round <- loadSummarizedExperiment(out, tmp)

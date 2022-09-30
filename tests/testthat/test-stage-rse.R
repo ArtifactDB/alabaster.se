@@ -17,6 +17,7 @@ test_that("stageObject works as expected for RSE objects", {
     dir.create(tmp)
 
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     expect_identical(vapply(out$summarized_experiment$assays, function(x) x$name, ""), assayNames(se))
 
     # Make sure that no mcols were saved for the ranges.
@@ -70,6 +71,7 @@ test_that("stageObject allows us to forcibly skip the ranges", {
     dir.create(tmp)
 
     out <- stageObject(se, tmp, "rnaseq", skip.ranges=TRUE)
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     expect_true("row_data" %in% names(out$summarized_experiment))
     expect_false("row_ranges" %in% names(out$summarized_experiment))
 
@@ -85,6 +87,7 @@ test_that("stageObject handles GRLs", {
     dir.create(tmp)
 
     out <- stageObject(se, tmp, "rnaseq")
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
     rrmeta <- jsonlite::fromJSON(file.path(tmp, paste0(out$summarized_experiment$row_ranges$resource$path, ".json")), simplifyVector=FALSE)
     expect_true(rrmeta$compressed_list$names)
 
