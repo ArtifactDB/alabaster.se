@@ -65,7 +65,7 @@ test_that("stageObject works as expected with no row or column names", {
     expect_equal(rowData(se), rowData(out2))
 })
 
-test_that("stageObject works as expected with no row or column data", {
+test_that("stageObject works as expected with no row or column data, but still names", {
     tmp <- tempfile()
     dir.create(tmp)
 
@@ -80,6 +80,26 @@ test_that("stageObject works as expected with no row or column data", {
 
     rdf <- read.csv(file.path(tmp, out$summarized_experiment$row_data$resource$path), row.names=1)
     expect_equal(rdf, as.data.frame(rowData(se)))
+
+    # Round-tripping to make sure it's okay.
+    out2 <- loadSummarizedExperiment(out, tmp)
+    expect_equal(colData(se), colData(out2))
+    expect_equal(rowData(se), rowData(out2))
+})
+
+test_that("stageObject works as expected with no row or column data at all", {
+    tmp <- tempfile()
+    dir.create(tmp)
+
+    colData(se) <- colData(se)[,0]
+    rowData(se) <- rowData(se)[,0]
+    dimnames(se) <- list(NULL, NULL)
+
+    out <- stageObject(se, tmp, "rnaseq")
+    expect_identical(vapply(out$summarized_experiment$assays, function(x) x$name, ""), assayNames(se))
+
+    expect_null(out$summarized_experiment$column_data)
+    expect_null(out$summarized_experiment$row_data)
 
     # Round-tripping to make sure it's okay.
     out2 <- loadSummarizedExperiment(out, tmp)

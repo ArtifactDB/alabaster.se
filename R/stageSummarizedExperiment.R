@@ -56,22 +56,32 @@
 setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FALSE, meta.name="experiment.json", ...) {
     dir.create(file.path(dir, path), showWarnings=FALSE)
 
-    cd.info <- tryCatch({
-        info <- .stageObject(colData(x), dir, file.path(path, "coldata"), child=TRUE)
-        list(resource=.writeMetadata(info, dir=dir))
-    }, error=function(e) {
-        stop("failed to stage 'colData(<", class(x)[1], ">)'\n  - ", e$message)
-    })
+    cd <- colData(x)
+    empty.cd <- make_zero_col_DFrame(nrow(cd))
+    cd.info <- NULL
+    if (!identical(cd, empty.cd)) {
+        cd.info <- tryCatch({
+            info <- .stageObject(cd, dir, file.path(path, "coldata"), child=TRUE)
+            list(resource=.writeMetadata(info, dir=dir))
+        }, error=function(e) {
+            stop("failed to stage 'colData(<", class(x)[1], ">)'\n  - ", e$message)
+        })
+    }
 
     ass.info <- .stage_assays(x, dir, path)
     meta.info <- .processMetadata(x, dir, path, "metadata")
 
-    rd.info <- tryCatch({
-        info <- .stageObject(rowData(x), dir, file.path(path, "rowdata"), child=TRUE)
-        list(resource=.writeMetadata(info, dir=dir))
-    }, error=function(e) {
-        stop("failed to stage 'rowData(<", class(x)[1], ">)'\n  - ", e$message)
-    })
+    rd <- rowData(x)
+    empty.rd <- make_zero_col_DFrame(nrow(rd))
+    rd.info <- NULL
+    if (!identical(rd, empty.rd)) {
+        rd.info <- tryCatch({
+            info <- .stageObject(rd, dir, file.path(path, "rowdata"), child=TRUE)
+            list(resource=.writeMetadata(info, dir=dir))
+        }, error=function(e) {
+            stop("failed to stage 'rowData(<", class(x)[1], ">)'\n  - ", e$message)
+        })
+    }
 
     list(
         `$schema`="summarized_experiment/v1.json",

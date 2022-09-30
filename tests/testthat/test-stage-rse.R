@@ -35,16 +35,34 @@ test_that("stageObject auto-skips on empty rowRanges", {
     tmp <- tempfile()
     dir.create(tmp)
 
+    # GRL is empty.
     copy <- GRangesList(rep(list(GRanges()), nrow(se)))
     names(copy) <- rownames(se)
     rowRanges(se) <- copy
-    out <- stageObject(se, tmp, "rnaseq", skip.ranges=NA)
 
+    out <- stageObject(se, tmp, "rnaseq", skip.ranges=NA)
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
+
+    expect_null(out$summarized_experiment$row_ranges)
+    expect_null(out$summarized_experiment$row_data)
+
+    out2 <- loadSummarizedExperiment(out, tmp)
+    expect_identical(as.character(class(out2)), "SummarizedExperiment")
+
+    # Non-empty rowData but GRL is still empty.
+    mcols(copy)$FOO <- 2
+    rowRanges(se) <- copy
+
+    out <- stageObject(se, tmp, "rnaseq2", skip.ranges=NA)
+    expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
+
+    expect_null(out$summarized_experiment$row_ranges)
     mpath <- out$summarized_experiment$row_data$resource$path
     expect_match(jsonlite::fromJSON(file.path(tmp, paste0(mpath, ".json")))[["$schema"]], "csv_data_frame")
 
     out2 <- loadSummarizedExperiment(out, tmp)
     expect_identical(as.character(class(out2)), "SummarizedExperiment")
+    expect_identical(unique(rowData(out2)$FOO), 2)
 })
 
 test_that("stageObject allows us to forcibly skip the ranges", {

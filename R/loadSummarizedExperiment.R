@@ -42,10 +42,21 @@ loadSummarizedExperiment <- function(exp.info, project) {
         all.assays[[aname]] <- .loadObject(ass.info, project=project)
     }
 
-    cd.info <- acquireMetadata(project, exp.info$summarized_experiment$column_data$resource$path)
-    cd <- .loadObject(cd.info, project=project)
-    rd.info <- acquireMetadata(project, exp.info$summarized_experiment$row_data$resource$path)
-    rd <- .loadObject(rd.info, project=project)
+    cd.meta <- exp.info$summarized_experiment$column_data
+    if (!is.null(cd.meta)) {
+        cd.info <- acquireMetadata(project, cd.meta$resource$path)
+        cd <- .loadObject(cd.info, project=project)
+    } else {
+        cd <- make_zero_col_DFrame(exp.info$summarized_experiment$dimensions[2])
+    }
+
+    rd.meta <- exp.info$summarized_experiment$row_data
+    if (!is.null(rd.meta)) {
+        rd.info <- acquireMetadata(project, rd.meta$resource$path)
+        rd <- .loadObject(rd.info, project=project)
+    } else {
+        rd <- make_zero_col_DFrame(exp.info$summarized_experiment$dimensions[1])
+    }
 
     range.info <- exp.info$summarized_experiment$row_ranges
     if (is.null(range.info)) {
