@@ -110,6 +110,20 @@ test_that("stageObject works as expected with no row or column data at all", {
     expect_equal(rowData(se), rowData(out2))
 })
 
+test_that("stageObject fails when the assay names are NULL or non-unique", {
+    tmp <- tempfile()
+    dir.create(tmp)
+    ass <- assays(se)
+    names(ass) <- NULL
+    assays(se) <- ass
+    expect_error(stageObject(se, tmp, "rnaseq"), "non-zero number")
+
+    tmp <- tempfile()
+    dir.create(tmp)
+    assayNames(se) <- rep("FOO", length(assayNames(se)))
+    expect_error(stageObject(se, tmp, "rnaseq"), "non-zero number")
+})
+
 test_that("stageObject works with the various types of vectors", {
     tmp <- tempfile()
     dir.create(tmp)

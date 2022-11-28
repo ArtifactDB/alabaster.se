@@ -101,6 +101,10 @@ setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FA
 #' @importFrom SummarizedExperiment assay assayNames
 .stage_assays <- function(x, dir, path) {
     ass.names <- assayNames(x)
+    if (length(ass.names) == 0L || anyDuplicated(ass.names)) {
+        stop("SummarizedExperiment should contain a non-zero number of uniquely named assays")
+    }
+
     all.meta <- vector("list", length(ass.names))
 
     for (i in seq_along(all.meta)) {
