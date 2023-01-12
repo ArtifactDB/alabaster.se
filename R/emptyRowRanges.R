@@ -13,6 +13,10 @@
 #' In other words, non-empty \code{\link{mcols}} will not be used to determine that the \code{rowRanges} is not empty.
 #' However, non-empty fields in the \code{\link{metadata}} or in the inner \code{\link{mcols}} of the \linkS4class{GRanges} will trigger a non-emptiness decision.
 #' 
+#' @examples
+#' emptyRowRanges(SummarizedExperiment())
+#' emptyRowRanges(SummarizedExperiment(rowRanges=GRanges()))
+#' emptyRowRanges(SummarizedExperiment(rowRanges=GRangesList()))
 #' @export
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom IRanges PartitioningByEnd

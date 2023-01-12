@@ -51,6 +51,7 @@
 #' @export
 #' @rdname stageSummarizedExperiment
 #' @importFrom SummarizedExperiment colData rowData
+#' @importFrom S4Vectors make_zero_col_DFrame
 #' @import alabaster.base
 #' @import methods
 setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FALSE, meta.name="experiment.json", ...) {

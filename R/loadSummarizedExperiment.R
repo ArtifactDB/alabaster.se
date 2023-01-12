@@ -31,6 +31,7 @@
 #'
 #' @export
 #' @importFrom SummarizedExperiment SummarizedExperiment assays<-
+#' @importFrom S4Vectors make_zero_col_DFrame
 #' @import alabaster.base
 loadSummarizedExperiment <- function(exp.info, project) {
     all.assays <- list()
