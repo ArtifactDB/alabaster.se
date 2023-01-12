@@ -48,7 +48,7 @@ loadSummarizedExperiment <- function(exp.info, project) {
         cd.info <- acquireMetadata(project, cd.meta$resource$path)
         cd <- .loadObject(cd.info, project=project)
     } else {
-        cd <- make_zero_col_DFrame(exp.info$summarized_experiment$dimensions[2])
+        cd <- make_zero_col_DFrame(exp.info$summarized_experiment$dimensions[[2]])
     }
 
     rd.meta <- exp.info$summarized_experiment$row_data
@@ -56,7 +56,7 @@ loadSummarizedExperiment <- function(exp.info, project) {
         rd.info <- acquireMetadata(project, rd.meta$resource$path)
         rd <- .loadObject(rd.info, project=project)
     } else {
-        rd <- make_zero_col_DFrame(exp.info$summarized_experiment$dimensions[1])
+        rd <- make_zero_col_DFrame(exp.info$summarized_experiment$dimensions[[1]])
     }
 
     range.info <- exp.info$summarized_experiment$row_ranges
