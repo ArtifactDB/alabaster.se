@@ -116,12 +116,17 @@ test_that("stageObject fails when the assay names are NULL or non-unique", {
     ass <- assays(se)
     names(ass) <- NULL
     assays(se) <- ass
-    expect_error(stageObject(se, tmp, "rnaseq"), "non-zero number")
+    expect_error(stageObject(se, tmp, "rnaseq"), "should be named")
 
     tmp <- tempfile()
     dir.create(tmp)
     assayNames(se) <- rep("FOO", length(assayNames(se)))
-    expect_error(stageObject(se, tmp, "rnaseq"), "non-zero number")
+    expect_error(stageObject(se, tmp, "rnaseq"), "duplicate")
+
+    tmp <- tempfile()
+    dir.create(tmp)
+    assayNames(se) <- c("", head(LETTERS, length(assayNames(se)) - 1))
+    expect_error(stageObject(se, tmp, "rnaseq"), "empty")
 })
 
 test_that("stageObject works with the various types of vectors", {

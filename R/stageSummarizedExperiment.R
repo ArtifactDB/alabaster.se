@@ -99,11 +99,17 @@ setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FA
 })
 
 #' @importMethodsFrom alabaster.matrix stageObject
-#' @importFrom SummarizedExperiment assay assayNames
+#' @importFrom SummarizedExperiment assay assays assayNames
 .stage_assays <- function(x, dir, path) {
     ass.names <- assayNames(x)
-    if (length(ass.names) == 0L || anyDuplicated(ass.names)) {
-        stop("SummarizedExperiment should contain a non-zero number of uniquely named assays")
+    if (is.null(ass.names) && length(assays(x)) > 0) {
+        stop("assays should be named in a ", class(x)[1], " object")
+    }
+    if (anyDuplicated(ass.names)) {
+        stop("detected duplicate assay names in a ", class(x)[1], " object")
+    }
+    if (any(ass.names == "")) {
+        stop("detected empty assay name in a ", class(x)[1], " object")
     }
 
     all.meta <- vector("list", length(ass.names))
