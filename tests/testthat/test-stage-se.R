@@ -148,9 +148,9 @@ test_that("stageObject works with the various types of vectors", {
     expect_identical(read.csv(file.path(tmp, meta$columns[[2]]$levels$resource$path))[,1], LETTERS[10:1])
     expect_identical(meta$columns[[3]]$type, "integer")
     expect_identical(meta$columns[[4]]$type, "number")
-    expect_identical(meta$columns[[5]]$type, "ordered")
+    expect_true(meta$columns[[5]]$ordered)
     expect_identical(read.csv(file.path(tmp, meta$columns[[5]]$levels$resource$path))[,1], LETTERS[1:3])
-    expect_identical(meta$columns[[6]]$type, "date")
+    expect_identical(meta$columns[[6]]$format, "date")
 
     # Round-tripping to make sure it's okay.
     out2 <- loadSummarizedExperiment(out, tmp)
