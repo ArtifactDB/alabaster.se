@@ -10,10 +10,6 @@
 #' @return \code{x} is saved into \code{path} and \code{NULL} is invisibly returned.
 #'
 #' @details
-#' If \code{rangedsummarizedexperiment.skip.empty.ranges=TRUE} and \code{x} is a RangedSummarizedExperiment with \dQuote{empty} \code{\link{rowRanges}} (i.e., a \linkS4class{GRangesList} with zero-length entries),
-#' \code{stageObject} will save it to file without any genomic range information.
-#' This means that any subsequent \code{\link{loadObject}} on the staged assets will return a non-ranged SummarizedExperiment.
-#'
 #' By default, we consider the presence of data frames in the assays to be an error.
 #' Users should coerce these into an appropriate matrix type, e.g., a dense matrix or a sparse dgCMatrix.
 #' If a DataFrame as an assay is truly desired, users may set \code{\link{options}(alabaster.se.reject_data.frames=FALSE)} to skip the error.
@@ -173,26 +169,3 @@ setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FA
 
     all.meta
 }
-
-#' @export
-#' @importFrom SummarizedExperiment rowRanges
-#' @importFrom alabaster.base .stageObject .writeMetadata
-#' @importMethodsFrom alabaster.ranges stageObject
-#' @import methods
-setMethod("stageObject", "RangedSummarizedExperiment", function(x, dir, path, child=FALSE, ..., skip.ranges=FALSE) {
-    dir.create(file.path(dir, path), showWarnings=FALSE)
-    meta <- callNextMethod()
-
-    if (!skip.ranges && !emptyRowRanges(x)) {
-        rd.processed <- tryCatch({
-            rd.info <- .stageObject(rowRanges(x), dir, file.path(path, "rowranges"), mcols.name=NULL, child=TRUE) # skipping the mcols, as this is the row_data.
-            .writeMetadata(rd.info, dir=dir)
-        }, error=function(e) {
-            stop("failed to stage 'rowRanges(<", class(x)[1], ">)'\n  - ", e$message)
-        })
-
-        meta$summarized_experiment$row_ranges <- list(resource=rd.processed)
-    }
-
-    meta
-})
