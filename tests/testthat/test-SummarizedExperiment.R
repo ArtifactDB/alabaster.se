@@ -149,12 +149,17 @@ test_that("stageObject fails when the assay names are NULL or non-unique", {
     ass <- assays(se)
     names(ass) <- NULL
     assays(se) <- ass
-    expect_error(stageObject(se, tmp, "rnaseq"), "non-zero number")
+    expect_error(stageObject(se, tmp, "rnaseq"), "should be named")
 
     tmp <- tempfile()
     dir.create(tmp)
     assayNames(se) <- rep("FOO", length(assayNames(se)))
-    expect_error(stageObject(se, tmp, "rnaseq"), "non-zero number")
+    expect_error(stageObject(se, tmp, "rnaseq"), "duplicate")
+
+    tmp <- tempfile()
+    dir.create(tmp)
+    assayNames(se) <- c("", head(LETTERS, length(assayNames(se)) - 1))
+    expect_error(stageObject(se, tmp, "rnaseq"), "empty")
 
     # Fails in the new world.
     tmp <- tempfile()
@@ -181,8 +186,11 @@ test_that("stageObject works with the various types of vectors", {
     expect_identical(meta$columns[[3]]$type, "integer")
     expect_identical(meta$columns[[4]]$type, "number")
     expect_identical(meta$columns[[5]]$type, "factor")
+    expect_true(meta$columns[[5]]$ordered)
     expect_identical(read.csv(file.path(tmp, meta$columns[[5]]$levels$resource$path))[,1], LETTERS[1:3])
     expect_identical(meta$columns[[6]]$type, "string")
+    expect_identical(read.csv(file.path(tmp, meta$columns[[5]]$levels$resource$path))[,1], LETTERS[1:3])
+    expect_identical(meta$columns[[6]]$format, "date")
 
     # Round-tripping to make sure it's okay.
     out2 <- loadSummarizedExperiment(out, tmp)
