@@ -1,26 +1,16 @@
-#' Stage a SummarizedExperiment
+#' Save a SummarizedExperiment to disk
 #'
-#' Save a \linkS4class{SummarizedExperiment} to file inside the staging directory.
+#' Save a \linkS4class{SummarizedExperiment} to its on-disk representation.
 #' 
 #' @param x A \linkS4class{SummarizedExperiment} object or one of its subclasses.
-#' @inheritParams alabaster.base::stageObject
-#' @param meta.name String containing the name of the metadata file.
-#' @param ... Further arguments to pass to the \linkS4class{SummarizedExperiment} method.
-#' For the SummarizedExperiment itself, all further arguments are just ignored.
-#' @param skip.ranges Logical scalar indicating whether to avoid saving the \code{\link{rowRanges}}.
+#' @inheritParams alabaster.base::saveObject
+#' @param summarizedexperiment.allow.dataframe.assay Logical scalar indicating whether to allow data frames as assays of \code{x}.
+#' @param ... Further arguments to pass to internal \code{\link{altSaveObject}} calls.
 #'
-#' @return A named list of metadata that follows the \code{summarized_experiment} schema.
-#' The contents of \code{x} are saved into a \code{path} subdirectory inside \code{dir}.
+#' @return \code{x} is saved into \code{path} and \code{NULL} is invisibly returned.
 #'
 #' @details
-#' \code{meta.name} is only needed to set up the output \code{path}, for consistency with the \code{\link{stageObject}} contract.
-#' Callers should make sure to write the metadata to the same path by using \code{\link{.writeMetadata}} to create the JSON file.
-#'
-#' If \code{skip.ranges=TRUE}, the RangedSummarizedExperiment method just calls the SummarizedExperiment method, i.e., \code{\link{rowRanges}} are not saved.
-#' This avoids the hassle of switching classes and the associated problems, e.g., \url{https://github.com/Bioconductor/SummarizedExperiment/issues/29}.
-#' Note that any subsequent \code{\link{loadObject}} call on the staged assets will return a non-ranged SummarizedExperiment.
-#'
-#' If \code{x} is a RangedSummarizedExperiment with \dQuote{empty} \code{\link{rowRanges}} (i.e., a \linkS4class{GRangesList} with zero-length entries),
+#' If \code{rangedsummarizedexperiment.skip.empty.ranges=TRUE} and \code{x} is a RangedSummarizedExperiment with \dQuote{empty} \code{\link{rowRanges}} (i.e., a \linkS4class{GRangesList} with zero-length entries),
 #' \code{stageObject} will save it to file without any genomic range information.
 #' This means that any subsequent \code{\link{loadObject}} on the staged assets will return a non-ranged SummarizedExperiment.
 #'
@@ -30,11 +20,10 @@
 #' Note that this only works for \linkS4class{DataFrame} objects - data.frame objects will not be saved correctly.
 #'
 #' @author Aaron Lun
+#' @seealso
+#' \code{\link{readSummarizedExperiment}}, to read the SummarizedExperiment back into the R session.
 #' 
 #' @examples
-#' tmp <- tempfile()
-#' dir.create(tmp)
-#'
 #' mat <- matrix(rpois(10000, 10), ncol=10)
 #' colnames(mat) <- letters[1:10]
 #' rownames(mat) <- sprintf("GENE_%i", seq_len(nrow(mat)))
@@ -44,16 +33,75 @@
 #' rowData(se)$blah <- runif(1000)
 #' metadata(se)$whee <- "YAY"
 #' 
-#' dir.create(tmp)
-#' stageObject(se, dir=tmp, "rna-seq") 
-#' list.files(file.path(tmp, "rna-seq"))
+#' tmp <- tempfile()
+#' saveObject(se, tmp)
+#' list.files(tmp, recursive=TRUE)
 #' 
 #' @export
-#' @rdname stageSummarizedExperiment
+#' @aliases stageObject,SummarizedExperiment-method
+#' @name saveSummarizedExperiment
 #' @importFrom SummarizedExperiment colData rowData
 #' @importFrom S4Vectors make_zero_col_DFrame
+#' @importFrom jsonlite toJSON
 #' @import alabaster.base
 #' @import methods
+setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexperiment.allow.dataframe.assay=FALSE, ...) {
+    dir.create(path)
+    write(file=file.path(path, "OBJECT"), "summarized_experiment")
+    write(toJSON(list(dimensions=dim(x), version="1.0"), auto_unbox=TRUE), file=file.path(path, "summarized_experiment.json"))
+    args <- list(summarizedexperiment.allow.dataframe.assay=summarizedexperiment.allow.dataframe.assay, ...)
+
+    cd <- colData(x)
+    empty.cd <- make_zero_col_DFrame(nrow(cd))
+    if (!identical(cd, empty.cd)) { # respect row names, metadata, mcols...
+        tryCatch({
+            do.call(altSaveObject, c(list(cd, file.path(path, "column_data")), args))
+        }, error=function(e) {
+            stop("failed to stage 'colData(<", class(x)[1], ">)'\n  - ", e$message)
+        })
+    }
+
+    rd <- rowData(x)
+    empty.rd <- make_zero_col_DFrame(nrow(rd))
+    if (!identical(rd, empty.rd)) { # respect row names, metadata, mcols...
+        tryCatch({
+            do.call(altSaveObject, c(list(rd, file.path(path, "row_data")), args))
+        }, error=function(e) {
+            stop("failed to stage 'rowData(<", class(x)[1], ">)'\n  - ", e$message)
+        })
+    }
+
+    adir <- file.path(path, "assays")
+    dir.create(adir)
+    ass.names <- assayNames(x)
+    if (anyDuplicated(ass.names)) {
+        stop("assays should be uniquely named")
+    }
+    write(toJSON(ass.names), file=file.path(adir, "names.json"))
+
+    for (i in seq_along(ass.names)) {
+        aname <- as.character(i - 1L)
+        curmat <- assay(x, i, withDimnames=FALSE)
+
+        if (is.data.frame(curmat) || (is(curmat, "DataFrame") && !summarizedexperiment.allow.dataframe.assay)) {
+            stop("assays should not contain data frames, see ?'saveObject,SummarizedExperiment-method'")
+        }
+
+        tryCatch({
+            do.call(altSaveObject, c(list(curmat, file.path(adir, aname)), args))
+        }, error=function(e) {
+            stop("failed to stage 'assay(<", class(x)[1], ">, ", i, ")'\n  - ", e$message)
+        })
+    }
+
+    saveMetadata(x, metadata.path=file.path(path, "other_data"), mcols.path=NULL)
+})
+
+##################################
+######### OLD STUFF HERE #########
+##################################
+
+#' @export
 setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FALSE, meta.name="experiment.json", ...) {
     dir.create(file.path(dir, path), showWarnings=FALSE)
 
@@ -127,7 +175,6 @@ setMethod("stageObject", "SummarizedExperiment", function(x, dir, path, child=FA
 }
 
 #' @export
-#' @rdname stageSummarizedExperiment
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom alabaster.base .stageObject .writeMetadata
 #' @importMethodsFrom alabaster.ranges stageObject
