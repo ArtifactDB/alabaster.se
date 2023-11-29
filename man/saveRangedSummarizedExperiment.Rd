@@ -3,6 +3,7 @@
 \name{saveRangedSummarizedExperiment}
 \alias{saveRangedSummarizedExperiment}
 \alias{stageObject,RangedSummarizedExperiment-method}
+\alias{saveObject,RangedSummarizedExperiment-method}
 \title{Save a RangedSummarizedExperiment to disk}
 \usage{
 \S4method{saveObject}{RangedSummarizedExperiment}(x, path, rangedsummarizedexperiment.skip.empty.ranges = TRUE, ...)

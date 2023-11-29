@@ -33,9 +33,12 @@
 #' saveObject(se, tmp)
 #' list.files(tmp, recursive=TRUE)
 #' 
-#' @export
 #' @aliases stageObject,SummarizedExperiment-method
 #' @name saveSummarizedExperiment
+NULL
+
+#' @export
+#' @rdname saveSummarizedExperiment
 #' @importFrom SummarizedExperiment colData rowData
 #' @importFrom S4Vectors make_zero_col_DFrame
 #' @importFrom jsonlite toJSON

@@ -34,9 +34,14 @@
 #' saveObject(se, tmp)
 #' list.files(tmp, recursive=TRUE)
 #' 
-#' @export
-#' @aliases stageObject,RangedSummarizedExperiment-method
+#' @aliases 
+#' stageObject,RangedSummarizedExperiment-method
 #' @name saveRangedSummarizedExperiment
+NULL
+
+#' @export
+#' @export
+#' @rdname saveRangedSummarizedExperiment
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom S4Vectors mcols<-
 setMethod("saveObject", "RangedSummarizedExperiment", function(x, path, rangedsummarizedexperiment.skip.empty.ranges=TRUE, ...) {

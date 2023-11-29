@@ -3,6 +3,7 @@
 \name{saveSummarizedExperiment}
 \alias{saveSummarizedExperiment}
 \alias{stageObject,SummarizedExperiment-method}
+\alias{saveObject,SummarizedExperiment-method}
 \title{Save a SummarizedExperiment to disk}
 \usage{
 \S4method{saveObject}{SummarizedExperiment}(x, path, summarizedexperiment.allow.dataframe.assay = FALSE, ...)

@@ -28,7 +28,7 @@
 #' readRangedSummarizedExperiment(tmp)
 #'
 #' @export
-#' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<-
+#' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- rowRanges<-
 #' @import alabaster.base
 readRangedSummarizedExperiment <- function(path, ...) {
     se <- altReadObject(path, type="summarized_experiment", ...)

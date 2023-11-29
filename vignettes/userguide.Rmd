@@ -15,18 +15,18 @@ vignette: >
 
 ```{r, echo=FALSE}
 library(BiocStyle)
-self <- Githubpkg("ArtifactDB/alabaster.se")
+self <- Biocpkg("alabaster.se")
 knitr::opts_chunk$set(error=FALSE, warning=FALSE, message=FALSE)
 ```
 
 # Overview 
 
 The `r self` package implements methods to save `SummarizedExperiment` objects to file artifacts and load them back into R.
-Check out the `r Githubpkg("ArtifactDB/alabaster.base")` for more details on the motivation and concepts of the **alabaster** framework.
+Check out the `r Biocpkg("alabaster.base")` for more details on the motivation and concepts of the **alabaster** framework.
 
 # Quick start
 
-Given a `(Ranged)SummarizedExperiment`, we can use `stageObject()` to save it inside a staging directory:
+Given a `(Ranged)SummarizedExperiment`, we can use `saveObject()` to save it inside a staging directory:
 
 ```{r}
 library(SummarizedExperiment)
@@ -35,22 +35,17 @@ rse
 
 library(alabaster.se)
 tmp <- tempfile()
-dir.create(tmp)
-meta <- stageObject(rse, tmp, "se")
-.writeMetadata(meta, tmp)
+saveObject(rse, tmp)
 
 list.files(tmp, recursive=TRUE)
 ```
 
-We can then load it back into the session with `loadObject()`.
+We can then load it back into the session with `readObject()`.
 
 ```{r}
-meta <- acquireMetadata(tmp, "se/experiment.json")
-roundtrip <- loadObject(meta, tmp)
+roundtrip <- readObject(tmp)
 class(roundtrip)
 ```
-
-More details on the metadata and on-disk layout are provided in the [schema](https://artifactdb.github.io/BiocObjectSchemas/html/summarized_experiment/v1.html).
 
 # Session information {-}
 

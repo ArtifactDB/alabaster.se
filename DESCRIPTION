@@ -19,7 +19,8 @@ Imports:
     BiocGenerics,
     S4Vectors,
     IRanges,
-    GenomicRanges
+    GenomicRanges,
+    jsonlite
 Suggests:
     rmarkdown,
     knitr,
