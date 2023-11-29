@@ -1,5 +1,5 @@
 # This tests the RangedSummarizedExperiment staging.
-# library(testthat); library(alabaster.se); source("test-stage-rse.R")
+# library(testthat); library(alabaster.se); source("test-RangedSummarizedExperiment.R")
 
 set.seed(100)
 
@@ -63,7 +63,8 @@ test_that("stageObject auto-skips on empty rowRanges", {
     tmp <- tempfile()
     saveObject(se, tmp)
     out2 <- readObject(tmp)
-    expect_identical(as.character(class(out2)), "SummarizedExperiment")
+    expect_s4_class(out2, "RangedSummarizedExperiment")
+    expect_true(emptyRowRanges(out2))
     expect_false(file.exists(file.path(tmp, "row_ranges")))
 
     # Bug in rhdf5 with reading zero-length vectors.
@@ -92,7 +93,8 @@ test_that("stageObject auto-skips on empty rowRanges", {
     tmp <- tempfile()
     saveObject(se, tmp)
     out2 <- readObject(tmp)
-    expect_identical(as.character(class(out2)), "SummarizedExperiment")
+    expect_s4_class(out2, "RangedSummarizedExperiment")
+    expect_true(emptyRowRanges(out2))
     expect_identical(unique(rowData(out2)$FOO), 2)
     expect_false(file.exists(file.path(tmp, "row_ranges")))
 })

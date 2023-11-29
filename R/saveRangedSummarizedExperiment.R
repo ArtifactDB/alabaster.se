@@ -4,16 +4,9 @@
 #' 
 #' @param x A \linkS4class{RangedSummarizedExperiment} object or one of its subclasses.
 #' @inheritParams alabaster.base::saveObject
-#' @param rangedsummarizedexperiment.skip.empty.ranges Logical scalar indicating whether to skip empty row ranges.
 #' @param ... Further arguments to pass to \code{"\link{saveObject,SummarizedExperiment-method}"} and internal \code{\link{altSaveObject}} calls.
 #'
 #' @return \code{x} is saved into \code{path} and \code{NULL} is invisibly returned.
-#'
-#' @details
-#' If \code{rangedsummarizedexperiment.skip.empty.ranges=TRUE} and \code{x} is a RangedSummarizedExperiment with \dQuote{empty} \code{\link{rowRanges}} 
-#' (i.e., a \linkS4class{GRangesList} with zero-length entries, see \code{\link{emptyRowRanges}}),
-#' \code{saveObject} will save it as a \code{summarized_experiment} object, i.e., without any range information.
-#' This means that any subsequent \code{\link{readObject}} on the saved \code{path} will return a non-ranged SummarizedExperiment.
 #'
 #' @author Aaron Lun
 #' @seealso
@@ -44,21 +37,20 @@ NULL
 #' @rdname saveRangedSummarizedExperiment
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom S4Vectors mcols<-
-setMethod("saveObject", "RangedSummarizedExperiment", function(x, path, rangedsummarizedexperiment.skip.empty.ranges=TRUE, ...) {
+setMethod("saveObject", "RangedSummarizedExperiment", function(x, path, ...) {
     callNextMethod()
-    if (rangedsummarizedexperiment.skip.empty.ranges && emptyRowRanges(x)) {
-        return(invisible(NULL))
+
+    if (!emptyRowRanges(x)) {
+        rr <- rowRanges(x)
+        mcols(rr) <- NULL # removing mcols as these are absorbed into the SE's rowData.
+        names(rr) <- NULL # names are also absorbed into the SE's rowData.
+
+        tryCatch({
+            altSaveObject(rr, file.path(path, "row_ranges"), ...) 
+        }, error=function(e) {
+            stop("failed to stage 'rowRanges(<", class(x)[1], ">)'\n  - ", e$message)
+        })
     }
-
-    rr <- rowRanges(x)
-    mcols(rr) <- NULL # removing mcols as these are absorbed into the SE's rowData.
-    names(rr) <- NULL # names are also absorbed into the SE's rowData.
-
-    tryCatch({
-        altSaveObject(rr, file.path(path, "row_ranges"), rangedsummarizedexperiment.skip.empty.ranges=rangedsummarizedexperiment.skip.empty.ranges, ...)
-    }, error=function(e) {
-        stop("failed to stage 'rowRanges(<", class(x)[1], ">)'\n  - ", e$message)
-    })
 
     write(file=file.path(path, "OBJECT"), "ranged_summarized_experiment")
     invisible(NULL)

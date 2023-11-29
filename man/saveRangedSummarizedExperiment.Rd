@@ -6,14 +6,12 @@
 \alias{saveObject,RangedSummarizedExperiment-method}
 \title{Save a RangedSummarizedExperiment to disk}
 \usage{
-\S4method{saveObject}{RangedSummarizedExperiment}(x, path, rangedsummarizedexperiment.skip.empty.ranges = TRUE, ...)
+\S4method{saveObject}{RangedSummarizedExperiment}(x, path, ...)
 }
 \arguments{
 \item{x}{A \linkS4class{RangedSummarizedExperiment} object or one of its subclasses.}
 
 \item{path}{String containing the path to a directory in which to save \code{x}.}
-
-\item{rangedsummarizedexperiment.skip.empty.ranges}{Logical scalar indicating whether to skip empty row ranges.}
 
 \item{...}{Further arguments to pass to \code{"\link{saveObject,SummarizedExperiment-method}"} and internal \code{\link{altSaveObject}} calls.}
 }
@@ -22,12 +20,6 @@
 }
 \description{
 Save a \linkS4class{RangedSummarizedExperiment} to its on-disk representation.
-}
-\details{
-If \code{rangedsummarizedexperiment.skip.empty.ranges=TRUE} and \code{x} is a RangedSummarizedExperiment with \dQuote{empty} \code{\link{rowRanges}} 
-(i.e., a \linkS4class{GRangesList} with zero-length entries, see \code{\link{emptyRowRanges}}),
-\code{saveObject} will save it as a \code{summarized_experiment} object, i.e., without any range information.
-This means that any subsequent \code{\link{readObject}} on the saved \code{path} will return a non-ranged SummarizedExperiment.
 }
 \examples{
 mat <- matrix(rpois(10000, 10), ncol=10)

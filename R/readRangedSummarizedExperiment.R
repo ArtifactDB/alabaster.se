@@ -32,12 +32,17 @@
 #' @import alabaster.base
 readRangedSummarizedExperiment <- function(path, ...) {
     se <- altReadObject(path, type="summarized_experiment", ...)
-    rr <- altReadObject(file.path(path, "row_ranges"), ...)
 
-    # Avoid overriding the old rowData with the rowRanges's mcols.
-    old.rd <- rowData(se)
-    rowRanges(se) <- rr
-    rowData(se) <- old.rd
+    rrdir <- file.path(path, "row_ranges")
+    if (file.exists(rrdir)) {
+        # Avoid overriding the old rowData with the rowRanges's mcols.
+        rr <- altReadObject(rrdir, ...)
+        old.rd <- rowData(se)
+        rowRanges(se) <- rr
+        rowData(se) <- old.rd
+    } else {
+        se <- as(se, "RangedSummarizedExperiment")
+    }
 
     se
 }
