@@ -52,6 +52,7 @@ setMethod("saveObject", "RangedSummarizedExperiment", function(x, path, ...) {
         })
     }
 
+    write(toJSON(list(dimensions=dim(x), version="1.0"), auto_unbox=TRUE), file=file.path(path, "ranged_summarized_experiment.json"))
     write(file=file.path(path, "OBJECT"), "ranged_summarized_experiment")
     invisible(NULL)
 })
