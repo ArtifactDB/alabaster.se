@@ -1,14 +1,15 @@
-#' Load a SummarizedExperiment
+#' Read a SummarizedExperiment from disk
 #'
-#' Default loading of \linkS4class{SummarizedExperiment}s based on the metadata stored by the corresponding \code{\link{stageObject}} method.
+#' Read a \linkS4class{SummarizedExperiment} from its on-disk representation.
 #'
-#' @param exp.info Named list containing the metadata for this experiment.
-#' @param project Any argument accepted by the acquisition functions, see \code{?\link{acquireFile}}. 
-#' By default, this should be a string containing the path to a staging directory.
+#' @param path String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{SummarizedExperiment} objects.
+#' @param ... Further arguments passed to internal \code{\link{altReadObject}} calls.
 #' 
-#' @return A \linkS4class{SummarizedExperiment} or \linkS4class{RangedSummarizedExperiment} object.
+#' @return A \linkS4class{SummarizedExperiment} object.
 #'
 #' @author Aaron Lun
+#' @seealso
+#' \code{"\link{saveObject,SummarizedExperiment-method}"}, to save the SummarizedExperiment to disk.
 #'
 #' @examples
 #' # Mocking up an experiment:
@@ -21,18 +22,55 @@
 #' rowData(se)$blah <- runif(1000)
 #' metadata(se)$whee <- "YAY"
 #' 
-#' # Staging it:
 #' tmp <- tempfile()
-#' dir.create(tmp)
-#' info <- stageObject(se, dir=tmp, "rna-seq") 
-#'
-#' # And loading it back in:
-#' loadSummarizedExperiment(info, tmp)
+#' saveObject(se, tmp)
+#' readSummarizedExperiment(tmp)
 #'
 #' @export
-#' @importFrom SummarizedExperiment SummarizedExperiment assays<-
+#' @aliases loadSummarizedExperiment
+#'
+#' @importFrom SummarizedExperiment SummarizedExperiment
+#' @importFrom jsonlite fromJSON
 #' @importFrom S4Vectors make_zero_col_DFrame
 #' @import alabaster.base
+readSummarizedExperiment <- function(path, ...) {
+    info <- fromJSON(file.path(path, "summarized_experiment.json"))
+    ass.names <- fromJSON(file.path(path, "assays", "names.json"))
+
+    all.assays <- list()
+    for (y in seq_along(ass.names)) {
+        all.assays[[ass.names[y]]] <- altReadObject(file.path(path, "assays", y - 1L), ...)
+    }
+
+    cd.path <- file.path(path, "column_data")
+    if (file.exists(cd.path)) {
+        cd <- altReadObject(cd.path, ...)
+    } else {
+        cd <- make_zero_col_DFrame(info$dimensions[2])
+    }
+
+    rd.path <- file.path(path, "row_data")
+    if (file.exists(rd.path)) {
+        rd <- altReadObject(rd.path, ...)
+    } else {
+        rd <- make_zero_col_DFrame(info$dimensions[1])
+    }
+
+    se <- SummarizedExperiment(all.assays, colData=cd, rowData=rd, checkDimnames=FALSE)
+
+    # Need to force the dimnames to match the DFs, because if they're NULL,
+    # the dimnames from the assays end up being used instead.
+    rownames(se) <- rownames(rd)
+    colnames(se) <- rownames(cd)
+
+    readMetadata(se, mcols.path=NULL, metadata.path = file.path(path, "other_data"))
+}
+
+##################################
+######### OLD STUFF HERE #########
+##################################
+
+#' @export
 loadSummarizedExperiment <- function(exp.info, project) {
     all.assays <- list()
     for (y in seq_along(exp.info$summarized_experiment$assays)) {

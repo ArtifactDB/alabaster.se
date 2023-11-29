@@ -30,6 +30,15 @@ test_that("stageObject works as expected for RSE objects", {
     expect_equal(colData(se), colData(out2))
     expect_equal(rowRanges(se), rowRanges(out2))
     expect_identical(length(rowData(out2)$whee), nrow(se))
+
+    # The new world works.
+    tmp <- tempfile()
+    saveObject(se, tmp)
+    out2 <- readObject(tmp)
+    expect_identical(colData(se), colData(out2))
+    expect_identical(rowRanges(se), rowRanges(out2))
+    expect_true(file.exists(file.path(tmp, "row_ranges", "OBJECT")))
+    expect_false(file.exists(file.path(tmp, "row_ranges", "range_annotations")))
 })
 
 test_that("stageObject auto-skips on empty rowRanges", {
@@ -40,6 +49,7 @@ test_that("stageObject auto-skips on empty rowRanges", {
     copy <- GRangesList(rep(list(GRanges()), nrow(se)))
     names(copy) <- rownames(se)
     rowRanges(se) <- copy
+    expect_true(emptyRowRanges(se))
 
     out <- stageObject(se, tmp, "rnaseq", skip.ranges=NA)
     expect_error(alabaster.base::.writeMetadata(out, tmp), NA)
@@ -49,6 +59,20 @@ test_that("stageObject auto-skips on empty rowRanges", {
 
     out2 <- loadSummarizedExperiment(out, tmp)
     expect_identical(as.character(class(out2)), "SummarizedExperiment")
+
+    tmp <- tempfile()
+    saveObject(se, tmp)
+    out2 <- readObject(tmp)
+    expect_identical(as.character(class(out2)), "SummarizedExperiment")
+    expect_false(file.exists(file.path(tmp, "row_ranges")))
+
+    # Bug in rhdf5 with reading zero-length vectors.
+#    tmp <- tempfile()
+#    saveObject(se, tmp, rangedsummarizedexperiment.skip.empty.ranges=FALSE)
+#    out2 <- readObject(tmp)
+#    expect_s4_class(out2, "RangedSummarizedExperiment")
+#    expect_true(file.exists(file.path(tmp, "row_ranges")))
+#    expect_true(emptyRowRanges(rowRanges(out2)))
 
     # Non-empty rowData but GRL is still empty.
     mcols(copy)$FOO <- 2
@@ -64,6 +88,13 @@ test_that("stageObject auto-skips on empty rowRanges", {
     out2 <- loadSummarizedExperiment(out, tmp)
     expect_identical(as.character(class(out2)), "SummarizedExperiment")
     expect_identical(unique(rowData(out2)$FOO), 2)
+
+    tmp <- tempfile()
+    saveObject(se, tmp)
+    out2 <- readObject(tmp)
+    expect_identical(as.character(class(out2)), "SummarizedExperiment")
+    expect_identical(unique(rowData(out2)$FOO), 2)
+    expect_false(file.exists(file.path(tmp, "row_ranges")))
 })
 
 test_that("stageObject allows us to forcibly skip the ranges", {
@@ -107,4 +138,10 @@ test_that("stageObject handles GRLs", {
     metadata(ref@unlistData) <- list()
     expect_equal(rowRanges(out2), ref)
     expect_s4_class(rowRanges(out2), "GenomicRangesList")
+
+    # The new world works.
+    tmp <- tempfile()
+    saveObject(se, tmp)
+    out2 <- readObject(tmp)
+    expect_identical(rowRanges(se), ref)
 })

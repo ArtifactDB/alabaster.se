@@ -19,13 +19,13 @@ Imports:
     BiocGenerics,
     S4Vectors,
     IRanges,
-    GenomicRanges
+    GenomicRanges,
+    jsonlite
 Suggests:
     rmarkdown,
     knitr,
     testthat,
-    BiocStyle,
-    jsonlite
+    BiocStyle
 VignetteBuilder: knitr
 RoxygenNote: 7.2.3
 biocViews:
