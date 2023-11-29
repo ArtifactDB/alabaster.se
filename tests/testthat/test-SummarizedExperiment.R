@@ -83,6 +83,19 @@ test_that("stageObject works as expected with no row or column names", {
     expect_equal(rowData(se), rowData(out2))
 })
 
+test_that("saveObject works as expected with no assays", {
+    tmp <- tempfile()
+    se <- SummarizedExperiment()
+    saveObject(se, tmp)
+    expect_identical(readObject(tmp), se)
+
+    # Plus some dimensions, at least.
+    tmp <- tempfile()
+    se <- SummarizedExperiment(colData=DataFrame(row.names=LETTERS), rowData=DataFrame(row.names=1:10))
+    saveObject(se, tmp)
+    expect_identical(readObject(tmp), se)
+})
+
 test_that("stageObject works as expected with no row or column data, but still names", {
     tmp <- tempfile()
     dir.create(tmp)

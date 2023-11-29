@@ -70,31 +70,36 @@ setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexpe
         })
     }
 
-    adir <- file.path(path, "assays")
-    dir.create(adir)
-    ass.names <- assayNames(x)
-    if (is.null(ass.names)) {
-        stop("assays should be named")
-    } else if (any(ass.names == "")) {
-        stop("assays should have non-empty names")
-    } else if (anyDuplicated(ass.names)) {
-        stop("assays should be uniquely named")
-    }
-    write(toJSON(ass.names), file=file.path(adir, "names.json"))
+    all.assays <- assays(x, withDimnames=FALSE)
+    num.assays <- length(all.assays)
+    if (num.assays) {
+        adir <- file.path(path, "assays")
+        dir.create(adir)
 
-    for (i in seq_along(ass.names)) {
-        aname <- as.character(i - 1L)
-        curmat <- assay(x, i, withDimnames=FALSE)
-
-        if (is.data.frame(curmat) || (is(curmat, "DataFrame") && !summarizedexperiment.allow.dataframe.assay)) {
-            stop("assays should not contain data frames, see ?'saveObject,SummarizedExperiment-method'")
+        ass.names <- assayNames(x)
+        if (is.null(ass.names)) {
+            stop("assays should be named")
+        } else if (any(ass.names == "")) {
+            stop("assays should have non-empty names")
+        } else if (anyDuplicated(ass.names)) {
+            stop("assays should be uniquely named")
         }
+        write(toJSON(ass.names), file=file.path(adir, "names.json"))
 
-        tryCatch({
-            do.call(altSaveObject, c(list(curmat, file.path(adir, aname)), args))
-        }, error=function(e) {
-            stop("failed to stage 'assay(<", class(x)[1], ">, ", i, ")'\n  - ", e$message)
-        })
+        for (i in seq_along(ass.names)) {
+            aname <- as.character(i - 1L)
+            curmat <- all.assays[[i]]
+
+            if (is.data.frame(curmat) || (is(curmat, "DataFrame") && !summarizedexperiment.allow.dataframe.assay)) {
+                stop("assays should not contain data frames, see ?'saveObject,SummarizedExperiment-method'")
+            }
+
+            tryCatch({
+                do.call(altSaveObject, c(list(curmat, file.path(adir, aname)), args))
+            }, error=function(e) {
+                stop("failed to stage 'assay(<", class(x)[1], ">, ", i, ")'\n  - ", e$message)
+            })
+        }
     }
 
     saveMetadata(x, metadata.path=file.path(path, "other_data"), mcols.path=NULL)

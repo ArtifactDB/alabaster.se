@@ -35,11 +35,14 @@
 #' @import alabaster.base
 readSummarizedExperiment <- function(path, ...) {
     info <- fromJSON(file.path(path, "summarized_experiment.json"))
-    ass.names <- fromJSON(file.path(path, "assays", "names.json"))
 
     all.assays <- list()
-    for (y in seq_along(ass.names)) {
-        all.assays[[ass.names[y]]] <- altReadObject(file.path(path, "assays", y - 1L), ...)
+    names(all.assays) <- character(0)
+    if (file.exists(file.path(path, "assays"))) {
+        ass.names <- fromJSON(file.path(path, "assays", "names.json"))
+        for (y in seq_along(ass.names)) {
+            all.assays[[ass.names[y]]] <- altReadObject(file.path(path, "assays", y - 1L), ...)
+        }
     }
 
     cd.path <- file.path(path, "column_data")
