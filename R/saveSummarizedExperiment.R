@@ -73,7 +73,11 @@ setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexpe
     adir <- file.path(path, "assays")
     dir.create(adir)
     ass.names <- assayNames(x)
-    if (anyDuplicated(ass.names)) {
+    if (is.null(ass.names)) {
+        stop("assays should be named")
+    } else if (any(ass.names == "")) {
+        stop("assays should have non-empty names")
+    } else if (anyDuplicated(ass.names)) {
         stop("assays should be uniquely named")
     }
     write(toJSON(ass.names), file=file.path(adir, "names.json"))
