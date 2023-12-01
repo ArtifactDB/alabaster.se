@@ -67,14 +67,6 @@ test_that("stageObject auto-skips on empty rowRanges", {
     expect_true(emptyRowRanges(out2))
     expect_false(file.exists(file.path(tmp, "row_ranges")))
 
-    # Bug in rhdf5 with reading zero-length vectors.
-#    tmp <- tempfile()
-#    saveObject(se, tmp, rangedsummarizedexperiment.skip.empty.ranges=FALSE)
-#    out2 <- readObject(tmp)
-#    expect_s4_class(out2, "RangedSummarizedExperiment")
-#    expect_true(file.exists(file.path(tmp, "row_ranges")))
-#    expect_true(emptyRowRanges(rowRanges(out2)))
-
     # Non-empty rowData but GRL is still empty.
     mcols(copy)$FOO <- 2
     rowRanges(se) <- copy
