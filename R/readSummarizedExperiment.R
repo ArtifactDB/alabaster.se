@@ -1,8 +1,10 @@
 #' Read a SummarizedExperiment from disk
 #'
 #' Read a \linkS4class{SummarizedExperiment} from its on-disk representation.
+#' This is usually not directly called by users, but is instead called by dispatch in \code{\link{readObject}}.
 #'
 #' @param path String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{SummarizedExperiment} objects.
+#' @param metadata Named list of metadata for this object, see \code{\link{readObjectFile}} for details.
 #' @param ... Further arguments passed to internal \code{\link{altReadObject}} calls.
 #' 
 #' @return A \linkS4class{SummarizedExperiment} object.
@@ -24,7 +26,7 @@
 #' 
 #' tmp <- tempfile()
 #' saveObject(se, tmp)
-#' readSummarizedExperiment(tmp)
+#' readObject(tmp)
 #'
 #' @export
 #' @aliases loadSummarizedExperiment
@@ -33,8 +35,8 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom S4Vectors make_zero_col_DFrame
 #' @import alabaster.base
-readSummarizedExperiment <- function(path, ...) {
-    info <- fromJSON(file.path(path, "summarized_experiment.json"))
+readSummarizedExperiment <- function(path, metadata, ...) {
+    info <- metadata$summarized_experiment
 
     all.assays <- list()
     names(all.assays) <- character(0)
@@ -49,14 +51,14 @@ readSummarizedExperiment <- function(path, ...) {
     if (file.exists(cd.path)) {
         cd <- altReadObject(cd.path, ...)
     } else {
-        cd <- make_zero_col_DFrame(info$dimensions[2])
+        cd <- make_zero_col_DFrame(info$dimensions[[2]])
     }
 
     rd.path <- file.path(path, "row_data")
     if (file.exists(rd.path)) {
         rd <- altReadObject(rd.path, ...)
     } else {
-        rd <- make_zero_col_DFrame(info$dimensions[1])
+        rd <- make_zero_col_DFrame(info$dimensions[[1]])
     }
 
     se <- SummarizedExperiment(all.assays, colData=cd, rowData=rd, checkDimnames=FALSE)

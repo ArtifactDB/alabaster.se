@@ -46,8 +46,12 @@ NULL
 #' @import methods
 setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexperiment.allow.dataframe.assay=FALSE, ...) {
     dir.create(path)
-    write(file=file.path(path, "OBJECT"), "summarized_experiment")
-    write(toJSON(list(dimensions=dim(x), version="1.0"), auto_unbox=TRUE), file=file.path(path, "summarized_experiment.json"))
+    saveObjectFile(
+        path, 
+        "summarized_experiment", 
+        list(summarized_experiment=list(version="1.0", dimensions=dim(x)))
+    )
+
     args <- list(summarizedexperiment.allow.dataframe.assay=summarizedexperiment.allow.dataframe.assay, ...)
 
     cd <- colData(x)

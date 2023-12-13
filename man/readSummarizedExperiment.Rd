@@ -5,10 +5,12 @@
 \alias{loadSummarizedExperiment}
 \title{Read a SummarizedExperiment from disk}
 \usage{
-readSummarizedExperiment(path, ...)
+readSummarizedExperiment(path, metadata, ...)
 }
 \arguments{
 \item{path}{String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{SummarizedExperiment} objects.}
+
+\item{metadata}{Named list of metadata for this object, see \code{\link{readObjectFile}} for details.}
 
 \item{...}{Further arguments passed to internal \code{\link{altReadObject}} calls.}
 }
@@ -17,6 +19,7 @@ A \linkS4class{SummarizedExperiment} object.
 }
 \description{
 Read a \linkS4class{SummarizedExperiment} from its on-disk representation.
+This is usually not directly called by users, but is instead called by dispatch in \code{\link{readObject}}.
 }
 \examples{
 # Mocking up an experiment:
@@ -31,7 +34,7 @@ metadata(se)$whee <- "YAY"
 
 tmp <- tempfile()
 saveObject(se, tmp)
-readSummarizedExperiment(tmp)
+readObject(tmp)
 
 }
 \seealso{

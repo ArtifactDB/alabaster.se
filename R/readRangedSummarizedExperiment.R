@@ -1,8 +1,10 @@
 #' Read a RangedSummarizedExperiment from disk
 #'
 #' Read a \linkS4class{RangedSummarizedExperiment} from its on-disk representation.
+#' This is usually not directly called by users, but is instead called by dispatch in \code{\link{readObject}}.
 #'
 #' @param path String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{RangedSummarizedExperiment} objects.
+#' @param metadata Named list of metadata for this object, see \code{\link{readObjectFile}} for details.
 #' @param ... Further arguments passed to \code{\link{readSummarizedExperiment}} and internal \code{\link{altReadObject}} calls.
 #' 
 #' @return A \linkS4class{RangedSummarizedExperiment} object.
@@ -25,13 +27,14 @@
 #' 
 #' tmp <- tempfile()
 #' saveObject(se, tmp)
-#' readRangedSummarizedExperiment(tmp)
+#' readObject(tmp)
 #'
 #' @export
 #' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- rowRanges<-
 #' @import alabaster.base
-readRangedSummarizedExperiment <- function(path, ...) {
-    se <- altReadObject(path, type="summarized_experiment", ...)
+readRangedSummarizedExperiment <- function(path, metadata, ...) {
+    metadata$type <- "summarized_experiment"
+    se <- altReadObject(path, metadata=metadata, ...)
 
     rrdir <- file.path(path, "row_ranges")
     if (file.exists(rrdir)) {
