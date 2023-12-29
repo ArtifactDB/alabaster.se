@@ -8,7 +8,7 @@
 readSummarizedExperiment(path, metadata, ...)
 }
 \arguments{
-\item{path}{String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{SummarizedExperiment} objects.}
+\item{path}{String containing a path to a directory, itself created using the \code{\link{saveObject}} method for \linkS4class{SummarizedExperiment} objects.}
 
 \item{metadata}{Named list of metadata for this object, see \code{\link{readObjectFile}} for details.}
 

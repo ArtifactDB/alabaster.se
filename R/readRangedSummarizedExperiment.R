@@ -3,7 +3,7 @@
 #' Read a \linkS4class{RangedSummarizedExperiment} from its on-disk representation.
 #' This is usually not directly called by users, but is instead called by dispatch in \code{\link{readObject}}.
 #'
-#' @param path String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{RangedSummarizedExperiment} objects.
+#' @param path String containing a path to a directory, itself created using the \code{\link{saveObject}} method for \linkS4class{RangedSummarizedExperiment} objects.
 #' @param metadata Named list of metadata for this object, see \code{\link{readObjectFile}} for details.
 #' @param ... Further arguments passed to \code{\link{readSummarizedExperiment}} and internal \code{\link{altReadObject}} calls.
 #' 
@@ -11,7 +11,7 @@
 #'
 #' @author Aaron Lun
 #' @seealso
-#' \code{"\link{saveObject,RangedSummarizedExperiment-method}"}, to save the SummarizedExperiment to disk.
+#' \code{"\link{saveObject,RangedSummarizedExperiment-method}"}, to save the RangedSummarizedExperiment to disk.
 #'
 #' @examples
 #' # Mocking up an experiment:

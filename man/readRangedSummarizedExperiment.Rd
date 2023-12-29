@@ -7,7 +7,7 @@
 readRangedSummarizedExperiment(path, metadata, ...)
 }
 \arguments{
-\item{path}{String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{RangedSummarizedExperiment} objects.}
+\item{path}{String containing a path to a directory, itself created using the \code{\link{saveObject}} method for \linkS4class{RangedSummarizedExperiment} objects.}
 
 \item{metadata}{Named list of metadata for this object, see \code{\link{readObjectFile}} for details.}
 
@@ -38,7 +38,7 @@ readObject(tmp)
 
 }
 \seealso{
-\code{"\link{saveObject,RangedSummarizedExperiment-method}"}, to save the SummarizedExperiment to disk.
+\code{"\link{saveObject,RangedSummarizedExperiment-method}"}, to save the RangedSummarizedExperiment to disk.
 }
 \author{
 Aaron Lun

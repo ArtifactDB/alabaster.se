@@ -3,7 +3,7 @@
 #' Read a \linkS4class{SummarizedExperiment} from its on-disk representation.
 #' This is usually not directly called by users, but is instead called by dispatch in \code{\link{readObject}}.
 #'
-#' @param path String containing a path to a directory, itself created using the \code{\link{stageObject}} method for \linkS4class{SummarizedExperiment} objects.
+#' @param path String containing a path to a directory, itself created using the \code{\link{saveObject}} method for \linkS4class{SummarizedExperiment} objects.
 #' @param metadata Named list of metadata for this object, see \code{\link{readObjectFile}} for details.
 #' @param ... Further arguments passed to internal \code{\link{altReadObject}} calls.
 #' 
