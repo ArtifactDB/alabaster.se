@@ -250,7 +250,7 @@ test_that("stageObject handles data frames in the assays", {
     expect_error(saveObject(se, tmp), "should not contain data frames")
 
     tmp <- tempfile()
-    saveObject(se2, tmp, summarizedexperiment.allow.dataframe.assay=TRUE)
+    saveObject(se2, tmp, SummarizedExperiment.allow.dataframe.assay=TRUE)
     out2 <- readObject(tmp)
     expect_identical(assay(se2), assay(out2))
 })

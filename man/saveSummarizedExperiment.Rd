@@ -6,14 +6,14 @@
 \alias{saveObject,SummarizedExperiment-method}
 \title{Save a SummarizedExperiment to disk}
 \usage{
-\S4method{saveObject}{SummarizedExperiment}(x, path, summarizedexperiment.allow.dataframe.assay = FALSE, ...)
+\S4method{saveObject}{SummarizedExperiment}(x, path, SummarizedExperiment.allow.dataframe.assay = FALSE, ...)
 }
 \arguments{
 \item{x}{A \linkS4class{SummarizedExperiment} object or one of its subclasses.}
 
 \item{path}{String containing the path to a directory in which to save \code{x}.}
 
-\item{summarizedexperiment.allow.dataframe.assay}{Logical scalar indicating whether to allow data frames as assays of \code{x}.}
+\item{SummarizedExperiment.allow.dataframe.assay}{Logical scalar indicating whether to allow data frames as assays of \code{x}.}
 
 \item{...}{Further arguments to pass to internal \code{\link{altSaveObject}} calls.}
 }

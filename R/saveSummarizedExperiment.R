@@ -4,7 +4,7 @@
 #' 
 #' @param x A \linkS4class{SummarizedExperiment} object or one of its subclasses.
 #' @inheritParams alabaster.base::saveObject
-#' @param summarizedexperiment.allow.dataframe.assay Logical scalar indicating whether to allow data frames as assays of \code{x}.
+#' @param SummarizedExperiment.allow.dataframe.assay Logical scalar indicating whether to allow data frames as assays of \code{x}.
 #' @param ... Further arguments to pass to internal \code{\link{altSaveObject}} calls.
 #'
 #' @return \code{x} is saved into \code{path} and \code{NULL} is invisibly returned.
@@ -44,7 +44,7 @@ NULL
 #' @importFrom jsonlite toJSON
 #' @import alabaster.base
 #' @import methods
-setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexperiment.allow.dataframe.assay=FALSE, ...) {
+setMethod("saveObject", "SummarizedExperiment", function(x, path, SummarizedExperiment.allow.dataframe.assay=FALSE, ...) {
     dir.create(path)
     saveObjectFile(
         path, 
@@ -52,7 +52,7 @@ setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexpe
         list(summarized_experiment=list(version="1.0", dimensions=dim(x)))
     )
 
-    args <- list(summarizedexperiment.allow.dataframe.assay=summarizedexperiment.allow.dataframe.assay, ...)
+    args <- list(SummarizedExperiment.allow.dataframe.assay=SummarizedExperiment.allow.dataframe.assay, ...)
 
     cd <- colData(x)
     empty.cd <- make_zero_col_DFrame(nrow(cd))
@@ -94,7 +94,7 @@ setMethod("saveObject", "SummarizedExperiment", function(x, path, summarizedexpe
             aname <- as.character(i - 1L)
             curmat <- all.assays[[i]]
 
-            if (is.data.frame(curmat) || (is(curmat, "DataFrame") && !summarizedexperiment.allow.dataframe.assay)) {
+            if (is.data.frame(curmat) || (is(curmat, "DataFrame") && !SummarizedExperiment.allow.dataframe.assay)) {
                 stop("assays should not contain data frames, see ?'saveObject,SummarizedExperiment-method'")
             }
 
