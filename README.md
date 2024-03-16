@@ -11,7 +11,7 @@ To get started, install the package and its dependencies from Bioconductor:
 
 ```r
 # install.packages("BiocManager")
-BiocManager::install("alabaster.matrix")
+BiocManager::install("alabaster.se")
 ```
 
 In the example below, we save a `RangedSummarizedExperiment` object to file:
