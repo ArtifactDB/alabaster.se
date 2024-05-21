@@ -41,8 +41,10 @@ readRangedSummarizedExperiment <- function(path, metadata, ...) {
         # Avoid overriding the old rowData with the rowRanges's mcols.
         rr <- altReadObject(rrdir, ...)
         old.rd <- rowData(se)
+        old.names <- rownames(se)
         rowRanges(se) <- rr
         rowData(se) <- old.rd
+        rownames(se) <- old.names
     } else {
         se <- as(se, "RangedSummarizedExperiment")
     }

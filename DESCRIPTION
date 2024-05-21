@@ -1,7 +1,7 @@
 Package: alabaster.se
 Title: Load and Save SummarizedExperiments from File
-Version: 1.5.1
-Date: 2024-05-20
+Version: 1.5.2
+Date: 2024-05-21
 Authors@R: person("Aaron", "Lun", role=c("aut", "cre"), email="infinite.monkeys.with.keyboards@gmail.com")
 License: MIT + file LICENSE
 Description: 

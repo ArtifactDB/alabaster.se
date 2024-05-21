@@ -41,6 +41,19 @@ test_that("stageObject works as expected for RSE objects", {
     expect_false(file.exists(file.path(tmp, "row_ranges", "range_annotations")))
 })
 
+test_that("saveObject preserves RSE rownames", {
+    copy <- se
+    rownames(copy) <- sprintf("GENE_%i", seq_len(nrow(copy)))
+
+    tmp <- tempfile()
+    saveObject(copy, tmp)
+    out2 <- readObject(tmp)
+
+    expect_identical(rownames(out2), rownames(copy))
+    expect_identical(rowRanges(out2), rowRanges(copy))
+    expect_identical(rowData(out2), rowData(copy))
+})
+
 test_that("stageObject auto-skips on empty rowRanges", {
     tmp <- tempfile()
     dir.create(tmp)
