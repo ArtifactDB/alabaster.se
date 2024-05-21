@@ -38,7 +38,11 @@ NULL
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom S4Vectors mcols<-
 setMethod("saveObject", "RangedSummarizedExperiment", function(x, path, ...) {
-    callNextMethod()
+    # Can't use callNextMethod() as we want to dispatch on application
+    # overrides; to avoid potential infinite recursion from the override
+    # calling back to saveObject, we explicitly cast to the base class.
+    base <- as(x, "SummarizedExperiment")
+    altSaveObject(base, path, ...)
 
     if (!emptyRowRanges(x)) {
         rr <- rowRanges(x)
