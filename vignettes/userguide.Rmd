@@ -29,8 +29,26 @@ Check out the `r Biocpkg("alabaster.base")` for more details on the motivation a
 Given a `(Ranged)SummarizedExperiment`, we can use `saveObject()` to save it inside a staging directory:
 
 ```{r}
+# Example taken from ?SummarizedExperiment
 library(SummarizedExperiment)
-example(SummarizedExperiment, echo=FALSE) # can't be bothered to copy it here.
+nrows <- 200
+ncols <- 6
+counts <- matrix(rpois(nrows * ncols, 10), nrows, ncols)
+rowRanges <- GRanges(
+    rep(c("chr1", "chr2"), c(50, 150)),
+    IRanges(floor(runif(200, 1e5, 1e6)), width=100),
+    strand=sample(c("+", "-"), 200, TRUE)
+)
+colData <- DataFrame(
+    Treatment=rep(c("ChIP", "Input"), 3), 
+    row.names=LETTERS[1:6]
+)
+rse <- SummarizedExperiment(
+    assays=SimpleList(counts=counts),
+    rowRanges=rowRanges, 
+    colData=colData
+)
+rownames(rse) <- sprintf("GENE_%03d", 1:200)
 rse
 
 library(alabaster.se)
@@ -44,7 +62,7 @@ We can then load it back into the session with `readObject()`.
 
 ```{r}
 roundtrip <- readObject(tmp)
-class(roundtrip)
+roundtrip
 ```
 
 # Session information {-}
