@@ -33,8 +33,12 @@
 #' @importFrom SummarizedExperiment SummarizedExperiment rowData rowData<- rowRanges<-
 #' @import alabaster.base
 readRangedSummarizedExperiment <- function(path, metadata, ...) {
-    metadata$type <- "summarized_experiment"
-    se <- altReadObject(path, metadata=metadata, ...)
+    # We don't try to respect application overrides when loading the base
+    # instance. Application developers should just pretend that we copied the
+    # code from readSummarizedExperiment, rather than trying to inject in
+    # custom code at this point, which gets too complicated - see the
+    # associated commentary for saveObject,SummarizedExperiment-method.
+    se <- readSummarizedExperiment(path, metadata=metadata, ...)
 
     rrdir <- file.path(path, "row_ranges")
     if (file.exists(rrdir)) {
