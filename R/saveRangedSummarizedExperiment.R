@@ -37,12 +37,26 @@ NULL
 #' @rdname saveRangedSummarizedExperiment
 #' @importFrom SummarizedExperiment rowRanges
 #' @importFrom S4Vectors mcols<-
-setMethod("saveObject", "RangedSummarizedExperiment", function(x, path, ...) {
-    # Can't use callNextMethod() as we want to dispatch on application
-    # overrides; to avoid potential infinite recursion from the override
-    # calling back to saveObject, we explicitly cast to the base class.
-    base <- as(x, "SummarizedExperiment")
-    altSaveObject(base, path, ...)
+setMethod("saveObject", "RangedSummarizedExperiment", 
+function(x, path, ...) {
+    # Note that the use of callNextMethod() means that we cannot respond to
+    # application overrides for the SummarizedExperiment base class. Developers
+    # should just pretend that saveObject,RSE-method copied all of the code
+    # from saveObject,SE-method; callNextMethod() is an implementation detail.
+    #
+    # This simplifies the dispatch and ensures that an override is only called
+    # once. Consider the alternative - namely, casting to the next subclass
+    # and then calling altSaveObject to respect the override. This would call
+    # the override's SE method repeatedly for every step from the subclass to
+    # SE. If the override's behavior is not idempotent, we have a problem.
+    # 
+    # So, if an application wants to set an override for all SEs, then it
+    # should define an altSaveObject,SE-method and then call it. If the
+    # override is slightly different for particular SE subclasses, developers
+    # should just duplicate the common override logic in the altSaveObject
+    # methods for affected subclasses, rather than expecting some injection of
+    # the overriding method into the saveObject dispatch hierarchy.
+    callNextMethod()
 
     if (!emptyRowRanges(x)) {
         rr <- rowRanges(x)
